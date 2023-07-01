@@ -1,8 +1,8 @@
 # mlkit-pose-detector-android-demo
 
 YouTube Tutorial Part 1: https://youtu.be/RJkB1OWLox8
-YouTube Tutorial Part 2: https://youtu.be/80bsPKgQtA4
 
+YouTube Tutorial Part 2: https://youtu.be/80bsPKgQtA4
 
 ## Todo List
 * Base function
