@@ -6,12 +6,12 @@ YouTube Tutorial Part 2: https://youtu.be/80bsPKgQtA4
 
 ## Todo List
 * Base function
-- [x] Camera permission - Complete
-- [x] CameraX implementation - Complete
-- [x] mlkit pose detector implementation - Complete
-- [x] Canvas drawing - Complete
-- [x] Visualization flipping - Complete
-- [x] Time synchronization - Complete
+- [x] Camera permission - Complete (Tutorial Part 1)
+- [x] CameraX implementation - Complete (Tutorial Part 1)
+- [x] mlkit pose detector implementation - Complete (Tutorial Part 1)
+- [x] Canvas drawing - Complete (Tutorial Part 1)
+- [x] Visualization flipping - Complete (Tutorial Part 2)
+- [x] Time synchronization - Complete (Tutorial Part 2)
 
 * Game function
 - [ ] A calibration function to check if all the body is visible - Incomplete
