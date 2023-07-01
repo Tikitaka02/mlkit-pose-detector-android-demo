@@ -71,6 +71,15 @@ public class MainActivity extends AppCompatActivity {
 
     Display display;
 
+    Bitmap bitmap4Save;
+
+    ArrayList<Bitmap> bitmapArrayList = new ArrayList<>();
+    ArrayList<Bitmap> bitmap4DisplayArrayList = new ArrayList<>();
+
+    ArrayList<Pose> poseArrayList = new ArrayList<>();
+
+    boolean isRunning = false;
+
     @ExperimentalGetImage
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +110,23 @@ public class MainActivity extends AppCompatActivity {
             getRuntimePermissions();
         }
     }
+
+    Runnable RunMlkit = new Runnable() {
+        @Override
+        public void run() {
+            poseDetector.process(InputImage.fromBitmap(bitmapArrayList.get(0),0)).addOnSuccessListener(new OnSuccessListener<Pose>() {
+                @Override
+                public void onSuccess(Pose pose) {
+                    poseArrayList.add(pose);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+        }
+    };
 
     @ExperimentalGetImage
     void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
@@ -134,46 +160,36 @@ public class MainActivity extends AppCompatActivity {
 
                 Matrix matrix = new Matrix();
                 matrix.postRotate(270);
-//                matrix.postScale(-1,1);
+                matrix.postScale(-1,1);
                 Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap,0,0,imageProxy.getWidth(), imageProxy.getHeight(),matrix,false);
 
-                Image mediaImage = imageProxy.getImage();
-                if (rotatedBitmap != null) {
-                    InputImage image =
-                            InputImage.fromBitmap(bitmap, imageProxy.getImageInfo().getRotationDegrees());
+                bitmapArrayList.add(rotatedBitmap);
 
-                    Task<Pose> result =
-                            poseDetector.process(image)
-                                    .addOnSuccessListener(
-                                            new OnSuccessListener<Pose>() {
-                                                @Override
-                                                public void onSuccess(Pose pose) {
-                                                    canvas = new Canvas(rotatedBitmap);
+                if (poseArrayList.size() >= 1) {
+                    canvas = new Canvas(bitmapArrayList.get(0));
 
-                                                    for (PoseLandmark poselandmark : pose.getAllPoseLandmarks()) {
-                                                        Log.e("PoseData","pose x: "+String.valueOf(poselandmark.getPosition().x));
-                                                        Log.e("PoseData","pose y: "+String.valueOf(poselandmark.getPosition().y));
+                    for (PoseLandmark poseLandmark : poseArrayList.get(0).getAllPoseLandmarks()) {
+                        canvas.drawCircle(poseLandmark.getPosition().x, poseLandmark.getPosition().y,5,mPaint);
+                    }
 
-                                                        canvas.drawCircle(poselandmark.getPosition().x, poselandmark.getPosition().y,5,
-                                                                mPaint);
-                                                    }
-
-                                                    display.getBitmap(rotatedBitmap);
-                                                    // Task completed successfully
-                                                    // ...
-                                                }
-                                            })
-                                    .addOnFailureListener(
-                                            new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.d("PoseData","pose failing");
-
-                                                    // Task failed with an exception
-                                                    // ...
-                                                }
-                                            });
+                    bitmap4DisplayArrayList.clear();
+                    bitmap4DisplayArrayList.add(bitmapArrayList.get(0));
+                    bitmap4Save = bitmapArrayList.get(bitmapArrayList.size()-1);
+                    bitmapArrayList.clear();
+                    bitmapArrayList.add(bitmap4Save);
+                    poseArrayList.clear();
+                    isRunning = false;
                 }
+
+                if (poseArrayList.size() == 0 && bitmapArrayList.size() >= 1 && !isRunning) {
+                    RunMlkit.run();
+                    isRunning = true;
+                }
+
+                if (bitmap4DisplayArrayList.size() >= 1) {
+                    display.getBitmap(bitmap4DisplayArrayList.get(0));
+                }
+
                 imageProxy.close();
             }
         });
